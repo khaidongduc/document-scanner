@@ -2,12 +2,12 @@ from document_scanner import DocumentScanner
 import os
 from cv2 import imshow, waitKey, imwrite
 
-document_scanner = DocumentScanner()
+document_scanner = DocumentScanner(canny_sigma=0.78)
 
 sample_folder = "sample"
 result_folder = "result"
 
-file_name = "sample.png"
+file_name = "sample2.jpg"
 sample_img_path = os.path.join(sample_folder, file_name)
 img = document_scanner.scan_document(sample_img_path)
 
