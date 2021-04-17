@@ -16,12 +16,12 @@ def auto_canny(image, sigma=0.33):
     return edged
 
 
-def find_biggest_contour_approx(contours):
+def find_biggest_contour_approx(contours, min_contour_area=MIN_CONTOUR_AREA):
     biggest_contour_approx = np.array([])
     max_area = 0
     for contour in contours:
         contour_area = cv2.contourArea(contour)
-        if contour_area > MIN_CONTOUR_AREA:
+        if contour_area > min_contour_area:
             contour_perimeter = cv2.arcLength(contour, closed=True)
             contour_approx = cv2.approxPolyDP(contour, 0.02 * contour_perimeter, closed=True)
             if contour_area > max_area and len(contour_approx) == RECTANGLE_NUM_SIZE:
