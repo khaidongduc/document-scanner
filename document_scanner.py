@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 import utils
 
-IMG_WIDTH = 480
-IMG_HEIGHT = 640
+IMG_WIDTH = 595
+IMG_HEIGHT = 842
 
 CANNY_SIGMA = 0.33
 
@@ -43,9 +43,11 @@ class DocumentScanner:
         self.__num_shrinking_pixel = num_shrinking_pixel
 
     def scan_document(self, img):
-        imgProcessed = self.__process_img(img)
+        img_width, img_height = self.__img_width, self.__img_height
+        imgResized = cv2.resize(img, (img_width, img_height))
+        imgProcessed = self.__process_img(imgResized)
         biggest_contour_approx = self.__find_biggest_contour(imgProcessed)
-        imgWarped = self.__warp_image(img, biggest_contour_approx)
+        imgWarped = self.__warp_image(imgResized, biggest_contour_approx)
         return imgWarped
 
     def __process_img(self, img):
