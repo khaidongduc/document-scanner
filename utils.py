@@ -41,3 +41,13 @@ def reorder_contour_approx(contour):
     points_result[2] = points[np.argmax(diff)]
 
     return points_result
+
+
+def remove_shadow(img):
+    dilated_img = cv2.dilate(img, np.ones((5, 5), np.uint8))
+    bg_img = cv2.medianBlur(dilated_img, 15)
+    diff_img = 255 - cv2.absdiff(img, bg_img)
+    norm_img = cv2.normalize(diff_img, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
+    _, thr_img = cv2.threshold(norm_img, 230, 0, cv2.THRESH_TRUNC)
+    cv2.normalize(thr_img, thr_img, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
+    return thr_img

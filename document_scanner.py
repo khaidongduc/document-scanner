@@ -48,6 +48,7 @@ class DocumentScanner:
         imgProcessed = self.__process_img(img)
         biggest_contour_approx = self.__find_biggest_contour(imgProcessed)
         imgWarped = self.__warp_image(img, biggest_contour_approx)
+        imgWarped = utils.remove_shadow(imgWarped)
         return imgWarped
 
     def __process_img(self, img):
