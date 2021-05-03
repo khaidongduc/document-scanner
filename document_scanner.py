@@ -2,15 +2,15 @@ import cv2
 import numpy as np
 import utils
 
-IMG_WIDTH = 595
-IMG_HEIGHT = 842
+IMG_WIDTH = 1240
+IMG_HEIGHT = 1754
 
 CANNY_SIGMA = 0.33
 
 DILATE_KERNEL = np.ones((3, 3))
 ERODE_KERNEL = np.ones((3, 3))
 
-GAUSSIAN_BLUR_KERNEL_SIZE = (1, 1)
+GAUSSIAN_BLUR_KERNEL_SIZE = (3, 3)
 GAUSSIAN_BLUR_BORDER_TYPE = cv2.BORDER_DEFAULT
 
 CONTOUR_MODE = cv2.RETR_EXTERNAL
@@ -47,22 +47,22 @@ class DocumentScanner:
         # imgResized = cv2.resize(img, (img_width, img_height))
         imgProcessed = self.__process_img(img)
         biggest_contour_approx = self.__find_biggest_contour(imgProcessed)
-        imgWarped = self.__warp_image(img, biggest_contour_approx)
-        imgWarped = utils.remove_shadow(imgWarped)
+        imgShadow = utils.remove_shadow(img)
+        imgWarped = self.__warp_image(imgShadow, biggest_contour_approx)
         return imgWarped
 
     def __process_img(self, img):
         imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # convert to gray scale
         imgBlur = cv2.GaussianBlur(imgGray, self.__gaussian_blur_kernel_size, self.__gaussian_blur_border_type, 0)
         imgEdged = utils.auto_canny(imgBlur, self.__canny_sigma)
-        imgDilated = cv2.dilate(imgEdged, kernel=self.__dilate_kernel, iterations=2)
+        imgDilated = cv2.dilate(imgEdged, kernel=self.__dilate_kernel, iterations=1)
         imgEroded = cv2.erode(imgDilated, kernel=self.__erode_kernel, iterations=1)
         return imgEroded
 
     def __find_biggest_contour(self, img):
         try:
             contours, hierarchy = cv2.findContours(img, self.__contour_mode, self.__contour_method)
-            biggestContourApprox, maxArea = utils.find_biggest_contour_approx(contours, self. __min_contour_area)
+            biggestContourApprox, maxArea = utils.find_biggest_contour_approx(contours, self.__min_contour_area)
             biggestContourApprox = utils.reorder_contour_approx(biggestContourApprox)
             return biggestContourApprox
         except ValueError as value_error:
@@ -76,5 +76,5 @@ class DocumentScanner:
         imgWarped = cv2.warpPerspective(img, transform_matrix, (self.__img_width, self.__img_height))
         # correction
         imgWarped = imgWarped[self.__num_shrinking_pixel:imgWarped.shape[0] - self.__num_shrinking_pixel,
-                              self.__num_shrinking_pixel:imgWarped.shape[1] - self.__num_shrinking_pixel]
+                    self.__num_shrinking_pixel:imgWarped.shape[1] - self.__num_shrinking_pixel]
         return imgWarped
